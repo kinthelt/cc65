@@ -133,6 +133,11 @@ and a half minutes) to keep its count right. <tt/sleep()/ gives the CPU to
 other processes while it waits. There is no real-time clock, so
 <tt/time()/ is not available.
 
+<sect1>Program arguments<p>
+
+816os doesn't pass arguments to programs, so <tt/argc/ is 0 and
+<tt/argv[0]/ is a NULL pointer.
+
 <sect1>Exit codes<p>
 
 The kernel has nowhere to put a program's exit code, so the value returned
