@@ -183,7 +183,7 @@ endif
 # Lists of subdirectories
 
 # disasm depends on cpp
-DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 kim1 cbm
+DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 kim1 cbm 816os
 
 # --------------------------------------------------------------------------
 # Lists of executables
@@ -412,6 +412,9 @@ EXELIST_sim65c02 = $(EXELIST_sim6502)
 EXELIST_rp6502 = \
         notavailable
 
+EXELIST_816os = \
+        notavailable
+
 EXELIST_supervision = \
         notavailable
 
@@ -474,6 +477,7 @@ all:
 # --------------------------------------------------------------------------
 # List of every supported platform
 TARGETS :=     \
+  816os        \
   agat         \
   apple2       \
   apple2enh    \
@@ -696,6 +700,7 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/supervision
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/disasm
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/816os
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/lynx
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sim65
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sym1
@@ -712,6 +717,7 @@ install:
 	$(INSTALL) -m0644 supervision/*.* $(DESTDIR)$(samplesdir)/supervision
 	$(INSTALL) -m0644 disasm/*.* $(DESTDIR)$(samplesdir)/disasm
 	$(INSTALL) -m0644 kim1/*.* $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -m0644 816os/*.* $(DESTDIR)$(samplesdir)/816os
 	$(INSTALL) -m0644 lynx/*.* $(DESTDIR)$(samplesdir)/lynx
 	$(INSTALL) -m0644 sim65/*.* $(DESTDIR)$(samplesdir)/sim65
 	$(INSTALL) -m0644 sym1/*.* $(DESTDIR)$(samplesdir)/sym1

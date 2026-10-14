@@ -1,0 +1,199 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>816os specific information for cc65
+<author><url url="https://github.com/kinthelt" name="kinthelt">
+
+<abstract>
+An overview of the 816os runtime system as it is implemented for the cc65 C
+compiler.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+816os is a preemptive multitasking operating system for a W65C816S
+breadboard computer. It runs up to seven programs at once, one in each of the
+RAM banks &dollar;01 to &dollar;07, plus a shell in ROM. This file describes
+how C programs built with <tt/-t 816os/ run as 816os processes.
+
+Please note that 816os specific functions are just mentioned here, they are
+described in the <tt/816os.h/ header file.
+
+<sect>Binary format<p>
+
+The output is a raw memory image, linked to run at &dollar;0000 of whatever
+bank the kernel puts it in. Build it with:
+
+<tscreen><verb>
+cl65 -t 816os -o hello.bin hello.c
+</verb></tscreen>
+
+There are two ways to run it:
+
+<itemize>
+<item>Send it to the machine with XMODEM from the shell, for example
+      <tt/load 30000/ to load it into bank 3, then start it with <tt/run 3/.
+<item>Build it into the ROM, in a program table like the one in 816os's
+      <tt>apps/demo_table.s</tt>, and start it with <tt>run &lt;name&gt;</tt>.
+</itemize>
+
+<sect>Memory layout<p>
+
+A program owns its whole bank. The kernel starts it at &dollar;0000 in native
+mode, with the data bank register set to that bank. cc65 code runs with 8-bit
+registers; the startup code switches to them.
+
+<descrip>
+  <tag/Program/
+  The code, read-only data and initialized data start at &dollar;0000,
+  followed by the BSS.
+
+  <tag/C stack/
+  The C runtime stack ends at &dollar;DFFF and grows downwards. It is 2 KB
+  by default; set <tt/__STACKSIZE__/ to change that.
+
+  <tag/&dollar;E000-&dollar;FFFF/
+  Left free, like in the configuration that 816os uses for its own
+  programs.
+
+  <tag/Heap/
+  The C heap starts at the end of the program and grows towards the C
+  stack.
+
+  <tag/Zero page/
+  The process's own 256-byte direct page in bank 0. The kernel picks its
+  place, and the CPU's direct page register points at it.
+
+  <tag/Hardware stack/
+  The process's own 2 KB stack in bank 0.
+
+</descrip><p>
+
+<sect>Platform specific header files<p>
+
+Programs containing 816os specific code may use the <tt/816os.h/ header file.
+It declares functions for the kernel services:
+
+<itemize>
+<item><tt/os816_putc/, <tt/os816_puts/ and <tt/os816_getc/ for raw console
+      I/O.
+<item><tt/os816_con_lock/ and <tt/os816_con_unlock/ to keep other processes'
+      output out of yours.
+<item><tt/os816_yield/, <tt/os816_getpid/ and <tt/os816_ticks/.
+<item><tt/os816_load/ and <tt/os816_save/ to transfer memory with XMODEM/CRC.
+<item><tt/os816_exec/ to start the program in another bank.
+</itemize>
+
+Assembly programs may include <tt/816os.inc/, which has the addresses of the
+kernel services. Call them with <tt/JSL/.
+
+<sect>Loadable drivers<p>
+
+There are no loadable drivers for 816os: no graphics, joystick, mouse,
+extended memory or RS232 drivers.
+
+<sect>Limitations<p>
+
+<sect1>Console I/O<p>
+
+stdin, stdout and stderr all go to the console:
+
+<itemize>
+<item>Output turns '\n' into CR LF. Each <tt/write()/ call holds the console
+      lock while it prints, so another process's output can't land in the
+      middle of it. A single <tt/printf()/ can make several <tt/write()/
+      calls, though. To keep a whole line together, put
+      <tt/os816_con_lock()/ and <tt/os816_con_unlock()/ around it.
+      These two calls nest, unlike the kernel's lock, so don't call
+      <tt/K_CON_LOCK/ directly from a C program.
+<item>Input is read a line at a time and echoed. Backspace and Delete erase
+      the last character, and Return ends the line. Ctrl-D on an empty line
+      is end-of-file. Only the foreground process gets input; a background
+      process that reads waits until it is brought to the foreground.
+</itemize>
+
+conio is not available.
+
+<sect1>Disk I/O<p>
+
+816os has no file system, so the C file I/O functions such as <tt/fopen/
+and <tt/remove/ are not available.
+
+<sect1>Time<p>
+
+<tt/clock()/ counts the kernel's timer ticks, <tt/CLOCKS_PER_SEC/ (200) per
+second. The kernel only hands out the low 16 bits of its tick count, so
+<tt/clock()/ has to be called at least once every 65536 ticks (about five
+and a half minutes) to keep its count right. <tt/sleep()/ gives the CPU to
+other processes while it waits. There is no real-time clock, so
+<tt/time()/ is not available.
+
+<sect1>Exit codes<p>
+
+The kernel has nowhere to put a program's exit code, so the value returned
+from <tt/main()/ or passed to <tt/exit()/ is dropped.
+
+<sect1>Running a program again<p>
+
+The kernel doesn't reload a program that is started with
+<tt>run &lt;bank&gt;</tt>. If a program that was loaded that way is run a
+second time, its initialized variables start with the values they had when
+the last run ended. Load it again first. Programs in ROM are copied afresh
+each time they are run.
+
+<sect1>Zero page and the direct page<p>
+
+The direct page is in bank 0, but code, data and the C stack are in the
+program's own bank. The 65816 adds the direct page register only to
+direct page addresses. Absolute addresses use the data bank register. Code
+that reaches a zero page variable through an absolute address misses it and
+hits the start of the program's bank instead, which is the program's code.
+The runtime library avoids this. In your own code, watch for:
+
+<itemize>
+<item><tt/lda zp,y/ and the other instructions that have no direct page,Y
+      form: the assembler silently makes them absolute,Y. The same applies
+      to C code that indexes an array declared in the zero page with
+      <tt/#pragma zpsym/.
+<item><tt/jmp (zp)/: the 65816 always reads the pointer from bank 0,
+      without adding the direct page register.
+</itemize>
+
+<sect1>Other<p>
+
+<itemize>
+<item>The debugger (<tt/dbg.h/) and dynamically loaded modules (<tt/modload.h/)
+      don't work.
+<item><tt/_sys()/ loads the status register from its argument, which also
+      sets the 65816's register widths. Keep bits 4 and 5 set.
+<item>Interrupts belong to the kernel. A program that disables them stops
+      every other process.
+</itemize>
+
+<sect>License<p>
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
+</enum>
+
+</article>

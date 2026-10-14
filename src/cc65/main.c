@@ -322,6 +322,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__AGAT__", 1);
             break;
 
+        case TGT_816OS:
+            DefineNumericMacro ("__816OS__", 1);
+            break;
+
         default:
             AbEnd ("Unknown target system '%s'", Sys);
     }

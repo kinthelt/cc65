@@ -633,6 +633,7 @@ Here is a description of all the command line options:
 
   <itemize>
   <item>none
+  <item>816os (programs for the 816os multitasking OS)
   <item>agat (a russian apple2 like computer)
   <item>apple2
   <item>apple2enh
@@ -1146,6 +1147,10 @@ This cc65 version has some extensions to the ISO C standard.
 The compiler defines several macros at startup:
 
 <descrip>
+  <tag><tt>__816OS__</tt></tag>
+
+  This macro is defined if the target is 816os (-t 816os).
+
   <tag><tt>__AGAT__</tt></tag>
 
   This macro is defined if the target is the Agat (-t agat).

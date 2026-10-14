@@ -33,7 +33,8 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-TARGETS = agat         \
+TARGETS = 816os        \
+          agat         \
           apple2       \
           apple2enh    \
           atari        \

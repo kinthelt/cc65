@@ -163,6 +163,7 @@ struct TargetEntry {
 */
 static const TargetEntry TargetMap[] = {
 /* BEGIN SORTED.SH */
+    {   "816os",        TGT_816OS        },
     {   "agat",         TGT_AGAT         },
     {   "apple2",       TGT_APPLE2       },
     {   "apple2enh",    TGT_APPLE2ENH    },
@@ -249,6 +250,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "rp6502",         CPU_W65C02,     BINFMT_BINARY,      CTNone  },
     { "agat",           CPU_6502,       BINFMT_BINARY,      CTAgat  },
+    { "816os",          CPU_65816,      BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

@@ -250,11 +250,23 @@ __printf:
 ; Save the register bank variables into the save area
 
         pha                             ; Save low byte of ap
+.ifp816
+        ; The 65816 has no "lda zp,y", and "lda abs,y" misses the direct page
+        ; when it isn't at $0000. Index with .X instead.
+        phx                             ; Save high byte of ap
+        ldx     #5
+Save:   lda     regbank,x
+        sta     RegSave,x
+        dex
+        bpl     Save
+        plx
+.else
         ldy     #5
 Save:   lda     regbank,y
         sta     RegSave,y
         dey
         bpl     Save
+.endif
         pla                             ; Restore low byte of ap
 
 ; Get the parameters from the stack
