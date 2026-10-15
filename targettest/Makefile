@@ -774,6 +774,17 @@ EXELIST_bbc = \
 EXELIST_lunix = \
 	notavailable
 
+# the others need conio, file I/O, drivers or other things 816os lacks
+EXELIST_816os = \
+	minimal \
+	div-test \
+	heaptest \
+	moddiv-test \
+	scanf-test \
+	strdup-test \
+	strnlen \
+	strqtok-test
+
 # omitted: arg-test clock-test clock cpeek-test conio cprintf cursor deb dir-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test
 # mouse-test mul-test posixio-test rename-test scanf-test seek ser-test strdup-test
@@ -817,6 +828,7 @@ all:
 # --------------------------------------------------------------------------
 # List of every supported platform
 TARGETS :=     \
+  816os        \
   apple2       \
   apple2enh    \
   atari        \

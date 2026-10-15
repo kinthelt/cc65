@@ -5195,6 +5195,7 @@ For better orthogonality, the assembler defines similar symbols as the
 compiler, depending on the target system selected:
 
 <itemize>
+<item><tt/__816OS__/ - Target system is <tt/816os/
 <item><tt/__AGAT__/ - Target system is <tt/agat/
 <item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/

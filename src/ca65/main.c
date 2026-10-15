@@ -408,6 +408,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__AGAT__", 1);
             break;
 
+        case TGT_816OS:
+            NewSymbol ("__816OS__", 1);
+            break;
+
         default:
             AbEnd ("Invalid target name: '%s'", Sys);
 

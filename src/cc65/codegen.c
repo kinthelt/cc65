@@ -670,11 +670,14 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
         AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d", RegOffs+2);
 
-    } else if (StackOffs <= RegOffs) {
+    } else if (StackOffs <= RegOffs && CPU != CPU_65816) {
 
         /* More bytes, but the relation between the register offset in the
         ** register bank and the stack offset allows us to generate short
         ** code that uses just one index register.
+        ** Not on the 65816: there is no "sta zp,y", so the assembler uses
+        ** "sta abs,y", which misses the register bank when the direct page
+        ** isn't at $0000.
         */
         unsigned Label = GetLocalLabel ();
         AddCodeLine ("ldy #$%02X", StackOffs);

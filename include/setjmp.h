@@ -38,7 +38,12 @@
 
 
 
+#if defined(__CPU_65816__)
+/* The 65816's stack pointer is 16 bits wide */
+typedef char jmp_buf [6];
+#else
 typedef char jmp_buf [5];
+#endif
 
 
 

@@ -30,10 +30,22 @@ _longjmp:
 
 ; Get the old stack pointer
 
+.ifp816
+        ; In native mode, S is 16 bits wide. TCS copies B and A to it.
+        iny
+        lda     (ptr1),y        ; high byte
+        xba
+        dey
+        lda     (ptr1),y        ; low byte
+        tcs
+        iny
+        iny
+.else
         lda     (ptr1),y
         iny
         tax
         txs
+.endif
 
 ; Get the return address and push it on the stack
 
